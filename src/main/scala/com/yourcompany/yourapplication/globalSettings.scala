@@ -48,6 +48,9 @@ object globalSettings {
    //Global.IMPALA_Setting.append(new huemul_KeyValuePath("production",getKeyFromFile(s"${localPath}prod-setting-impala-connection.set")))
    //Global.IMPALA_Setting.append(new huemul_KeyValuePath("experimental",getKeyFromFile(s"${localPath}exp-setting-impala-connection.set")))
 
+   //NEW FROM 2.6 --> add globalSettings Light validation, to use on notebooks
+   //Global.setValidationLight()
+
    /**
     * NEW FROM 2.5
     */
