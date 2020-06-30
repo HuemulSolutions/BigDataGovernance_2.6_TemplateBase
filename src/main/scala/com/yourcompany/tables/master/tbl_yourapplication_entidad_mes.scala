@@ -3,8 +3,8 @@ package com.yourcompany.tables.master
 
 import com.huemulsolutions.bigdata.common._
 import com.huemulsolutions.bigdata.control._
+import com.huemulsolutions.bigdata.dataquality.huemulType_DQNotification
 import com.huemulsolutions.bigdata.tables._
-import com.huemulsolutions.bigdata.dataquality._
 import org.apache.spark.sql.types._
 
 
@@ -20,8 +20,8 @@ class tbl_yourapplication_entidad_mes(huemulBigDataGov: huemul_BigDataGovernance
   this.setGlobalPaths(huemulBigDataGov.GlobalSettings.MASTER_SmallFiles_Path)
   //Ruta en HDFS especifica para esta tabla (Globalpaths / localPath)
   this.setLocalPath("yourapplication/")
-    //columna de particion
-  this.setPartitionField("periodo_mes")
+  //columna de particion
+  //metodo setPartitionField deprecado, ahora se especifica en cada columna, ej: columna.setPartitionColumn(1,true,true)
   //Frecuencia de actualización de los datos
   this.setFrequency(huemulType_Frequency.MONTHLY)
   //permite asignar un código de error personalizado al fallar la PK
@@ -64,35 +64,43 @@ class tbl_yourapplication_entidad_mes(huemulBigDataGov: huemul_BigDataGovernance
   /**********   C O L U M N A S   ****************************************/
 
     //Columna de periodo
-  val periodo_mes = new huemul_Columns (StringType, true,"periodo de los datos")
-            .setIsPK().setBusinessGlossary("BG001")  
-    
-  val ejemplo_producto_id = new huemul_Columns (IntegerType, true, "codigo del producto") 
+  val periodo_mes: huemul_Columns = new huemul_Columns (StringType, true,"periodo de los datos")
+      .setIsPK()
+      .setPartitionColumn(1, dropBeforeInsert = true, oneValuePerProcess = true)
+      .setBusinessGlossary("BG001")
+
+  val ejemplo_producto_id: huemul_Columns = new huemul_Columns (IntegerType, true, "codigo del producto")
           .securityLevel(huemulType_SecurityLevel.Public)  
   
-  val fecha_venta = new huemul_Columns (StringType, true, "fecha de la venta") 
+  val fecha_venta: huemul_Columns = new huemul_Columns (StringType, true, "fecha de la venta")
           .securityLevel(huemulType_SecurityLevel.Public)  
 
-  val cantidad = new huemul_Columns (DecimalType(10,2), true, "Cantidad del producto") 
+  val cantidad: huemul_Columns = new huemul_Columns (DecimalType(10,2), true, "Cantidad del producto")
           .securityLevel(huemulType_SecurityLevel.Public)  
 
-  val precio = new huemul_Columns (DecimalType(10,2), true, "Precio de la transaccion") 
-          .securityLevel(huemulType_SecurityLevel.Public)  
-
-
+  val precio: huemul_Columns = new huemul_Columns (DecimalType(10,2), true, "Precio de la transaccion")
+          .securityLevel(huemulType_SecurityLevel.Public)
 
   //**********Atributos adicionales de DataQuality 
   /*
             .setIsPK()         //por default los campos no son PK
             .setIsUnique("COD_ERROR") //por default los campos pueden repetir sus valores
             .setNullable() //por default los campos no permiten nulos
+            .setDQ_Nullable_Notification(huemulType_DQNotification.WARNING_EXCLUDE / ERROR / WARNING)
             .setDQ_MinDecimalValue(Decimal.apply(0),"COD_ERROR")
+            .setDQ_MinDecimalValue_Notification(huemulType_DQNotification.WARNING_EXCLUDE / ERROR / WARNING)
             .setDQ_MaxDecimalValue(Decimal.apply(200.0),"COD_ERROR")
+            .setDQ_MaxDecimalValue_Notification(huemulType_DQNotification.WARNING_EXCLUDE / ERROR / WARNING)
             .setDQ_MinDateTimeValue("2018-01-01","COD_ERROR")
+            .setDQ_MinDateTimeValue_Notification(huemulType_DQNotification.WARNING_EXCLUDE / ERROR / WARNING)
             .setDQ_MaxDateTimeValue("2018-12-31","COD_ERROR")
+            .setDQ_MaxDateTimeValue_Notification(huemulType_DQNotification.WARNING_EXCLUDE / ERROR / WARNING)
             .setDQ_MinLen(5,"COD_ERROR")
+            .setDQ_MinLen_Notification(huemulType_DQNotification.WARNING_EXCLUDE / ERROR / WARNING)
             .setDQ_MaxLen(100,"COD_ERROR")
+            .setDQ_MaxLen_Notification(huemulType_DQNotification.WARNING_EXCLUDE / ERROR / WARNING)
             .setDQ_RegExpresion("","COD_ERROR")                          //desde versión 2.0
+            .setDQ_RegExpresion_Notification(huemulType_DQNotification.WARNING_EXCLUDE / ERROR / WARNING)
   */
   //**********Atributos adicionales para control de cambios en los datos maestros
   /*
@@ -136,6 +144,15 @@ class tbl_yourapplication_entidad_mes(huemulBigDataGov: huemul_BigDataGovernance
   //************** ambos parametros son independientes (condicion o), cualquiera de las dos tolerancias que no se cumpla se gatilla el error o warning
   //DQ_NombreRegla.setTolerance(numfilas, porcentaje)
   //DQ_NombreRegla.setDQ_ExternalCode("Cod_001")
+
+  //**********Cambia nombres de campos MDM
+  //this.setNameForMDM_hash("your_custom_name_for_hash")
+  //this.setNameForMDM_StatusReg("your_custom_name_for_StatusReg")
+  //this.setNameForMDM_ProcessNew("your_custom_name_for_ProcessNew")
+  //this.setNameForMDM_ProcessChange("your_custom_name_for_ProcessChange")
+  //this.setNameForMDM_fhNew("your_custom_name_for_dtNew")
+  //this.setNameForMDM_fhChange("your_custom_name_for_dtChange")
+
     
   this.ApplyTableDefinition()
 }

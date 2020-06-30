@@ -4,9 +4,7 @@ import com.yourcompany.yourapplication.globalSettings._
 import com.huemulsolutions.bigdata.common._
 import com.huemulsolutions.bigdata.control._
 import com.huemulsolutions.bigdata.datalake._
-import com.huemulsolutions.bigdata.tables._
 import org.apache.spark.sql.types._
-import com.huemulsolutions.bigdata.control.huemulType_Frequency._
 import org.apache.spark.sql.Row
 
 //ESTE CODIGO FUE GENERADO A PARTIR DEL TEMPLATE DEL SITIO WEB
@@ -62,7 +60,7 @@ class raw_entidadPDF_mes(huemulBigDataGov: huemul_BigDataGovernance, Control: hu
    * ano: año de los archivos recibidos <br>
    * mes: mes de los archivos recibidos <br>
    * dia: dia de los archivos recibidos <br>
-   * Retorna: true si todo está OK, false si tuvo algún problema <br>
+   * Retorna: true si  está OK, false si tuvo algún problema <br>
   */
   def open(Alias: String, ControlParent: huemul_Control, ano: Integer, mes: Integer, dia: Integer, hora: Integer, min: Integer, seg: Integer): Boolean = {
     //Crea registro de control de procesos
@@ -107,7 +105,7 @@ class raw_entidadPDF_mes(huemulBigDataGov: huemul_BigDataGovernance, Control: hu
       
       control.NewStep("Aplicando Filtro sobre PDF")
       //el objeto DataRDD_extended contiene lo siguiente cuatro columnas:
-      //    x._1 -> fila leia desde PDF, esto es un correlativo de todo el PDF
+      //    x._1 -> fila leia desde PDF, esto es un correlativo del PDF
       //    x._2 -> entrega el largo de la fila, equivalente a realizar x._4.length()
       //    x._3 -> entrega el largo de la fila con trim, equivalente a x._4.trim().length()
       //    x._4 -> texto obtenido desde PDF
@@ -140,7 +138,7 @@ class raw_entidadPDF_mes(huemulBigDataGov: huemul_BigDataGovernance, Control: hu
       //*******************************************************
       //Genera resultado final de la tabla
       //*******************************************************
-      val rowRDD_Consolidado = rowRDD_Base.filter{x => x._6 == true} .map( x => (x._4 //código y texto original 
+      val rowRDD_Consolidado = rowRDD_Base.filter{x => x._6} .map(x => (x._4 //código y texto original
                                                 ,x._5(0)
                                                 ,x._5(1).trim()
                                                )
@@ -160,7 +158,7 @@ class raw_entidadPDF_mes(huemulBigDataGov: huemul_BigDataGovernance, Control: hu
       control.NewStep("RDD Final")     
       val rowRDD = rowRDD_Consolidado
             .map{ x=>
-                  var DataArray_Dest : Array[Any] = new Array[Any](2)
+                  val DataArray_Dest : Array[Any] = new Array[Any](2)
                   DataArray_Dest(0) = x._2
                   DataArray_Dest(1) = x._3
                   Row.fromSeq(DataArray_Dest )
@@ -187,12 +185,12 @@ class raw_entidadPDF_mes(huemulBigDataGov: huemul_BigDataGovernance, Control: hu
                         
       control.FinishProcessOK                      
     } catch {
-      case e: Exception => {
+      case e: Exception =>
         control.Control_Error.GetError(e, this.getClass.getName, null)
-        control.FinishProcessError()   
-      }
+        control.FinishProcessError()
     }         
-    return control.Control_Error.IsOK()
+
+    control.Control_Error.IsOK()
   }
 }
 
@@ -215,8 +213,8 @@ object raw_entidadPDF_mes_test {
     val Control = new huemul_Control(huemulBigDataGov, null, huemulType_Frequency.MONTHLY )
     
     /*************** PARAMETROS **********************/
-    var param_ano = huemulBigDataGov.arguments.GetValue("ano", null, "Debe especificar el parámetro año, ej: ano=2017").toInt
-    var param_mes = huemulBigDataGov.arguments.GetValue("mes", null, "Debe especificar el parámetro mes, ej: mes=12").toInt
+    val param_ano = huemulBigDataGov.arguments.GetValue("ano", null, "Debe especificar el parámetro año, ej: ano=2017").toInt
+    val param_mes = huemulBigDataGov.arguments.GetValue("mes", null, "Debe especificar el parámetro mes, ej: mes=12").toInt
     
     //Inicializa clase RAW  
     val DF_RAW =  new raw_entidadPDF_mes(huemulBigDataGov, Control)

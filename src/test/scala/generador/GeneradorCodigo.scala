@@ -8,7 +8,7 @@ import com.huemulsolutions.bigdata.control._
 import com.huemulsolutions.bigdata.tables.huemulType_Tables
 
 @Test
-class AppTest {
+class GeneradorCodigo {
     val args: Array[String] = new Array[String](1)
     args(0) = "Environment=production,RegisterInControl=false,TestPlanMode=true"
       
@@ -16,7 +16,7 @@ class AppTest {
     val Control = new huemul_Control(huemulBigDataGov,null,  huemulType_Frequency.ANY_MOMENT)
 
     @Test
-    def testOK() = assertTrue(GeneraCod)
+    def testOK(): Unit = assertTrue(GeneraCod())
 
     def GeneraCod(): Boolean = {            
       var row_class = new raw_entidad_mes(huemulBigDataGov,Control)
@@ -27,7 +27,7 @@ class AppTest {
                                   
                                   , huemulType_Tables.Transaction //TableType
                                   ,  huemulType_Frequency.MONTHLY //EsMes
-                                  , false //AutoMapping)
+                                  , AutoMapping = false //AutoMapping)
                                   )                    
        return true
     }

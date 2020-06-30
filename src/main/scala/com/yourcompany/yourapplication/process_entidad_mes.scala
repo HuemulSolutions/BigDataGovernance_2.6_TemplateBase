@@ -4,8 +4,7 @@ package com.yourcompany.yourapplication
 
 import com.huemulsolutions.bigdata.common._
 import com.huemulsolutions.bigdata.control._
-import java.util.Calendar;
-import org.apache.spark.sql.types._
+import java.util.Calendar
 import com.yourcompany.tables.master._
 import com.yourcompany.yourapplication.datalake._
 
@@ -26,13 +25,12 @@ object process_entidad_mes {
     var param_ano = huemulBigDataGov.arguments.GetValue("ano", null, "Debe especificar el parametro año, ej: ano=2017").toInt
     var param_mes = huemulBigDataGov.arguments.GetValue("mes", null, "Debe especificar el parametro mes, ej: mes=12").toInt
      
-    var param_dia = 1
+    val param_dia = 1
     val param_numMeses = huemulBigDataGov.arguments.GetValue("num_meses", "1").toInt
 
     /*************** CICLO REPROCESO MASIVO **********************/
     var i: Int = 1
-    var FinOK: Boolean = true
-    var Fecha = huemulBigDataGov.setDateTime(param_ano, param_mes, param_dia, 0, 0, 0)
+    val Fecha = huemulBigDataGov.setDateTime(param_ano, param_mes, param_dia, 0, 0, 0)
     
     while (i <= param_numMeses) {
       param_ano = huemulBigDataGov.getYear(Fecha)
@@ -40,7 +38,7 @@ object process_entidad_mes {
       println(s"Procesando Año $param_ano, Mes $param_mes ($i de $param_numMeses)")
       
       //Ejecuta codigo
-      var finControl = process_master(huemulBigDataGov, null, param_ano, param_mes)
+      val finControl = process_master(huemulBigDataGov, null, param_ano, param_mes)
       
       if (finControl.Control_Error.IsOK())
         i+=1
@@ -57,7 +55,7 @@ object process_entidad_mes {
   }
   
   /**
-    masterizacion de archivo [[CAMBIAR]] <br>
+    masterizacion de archivo [CAMBIAR] <br>
     param_ano: año de los datos  <br>
     param_mes: mes de los datos  <br>
    */
@@ -72,7 +70,7 @@ object process_entidad_mes {
       
       /*************** ABRE RAW DESDE DATALAKE **********************/
       Control.NewStep("Abre DataLake")  
-      var DF_RAW =  new raw_entidad_mes(huemulBigDataGov, Control)
+      val DF_RAW =  new raw_entidad_mes(huemulBigDataGov, Control)
       if (!DF_RAW.open("DF_RAW", Control, param_ano, param_mes, 1, 0, 0, 0))       
         Control.RaiseError(s"error encontrado, abortar: ${DF_RAW.Error.ControlError_Message}")
       
@@ -85,7 +83,7 @@ object process_entidad_mes {
       
       Control.NewStep("Generar Logica de Negocio")
       huemulTable.DF_from_SQL("FinalRAW"
-                          , s"""SELECT TO_DATE("${param_ano}-${param_mes}-1") as periodo_mes
+                          , s"""SELECT TO_DATE("$param_ano-$param_mes-1") as periodo_mes
                                      ,ejemplo_producto_id
                                      ,fecha_venta
                                      ,cantidad
@@ -115,13 +113,12 @@ object process_entidad_mes {
       
       Control.FinishProcessOK
     } catch {
-      case e: Exception => {
+      case e: Exception =>
         Control.Control_Error.GetError(e, this.getClass.getName, null)
         Control.FinishProcessError()
-      }
     }
     
-    return Control   
+    Control
   }
   
 }

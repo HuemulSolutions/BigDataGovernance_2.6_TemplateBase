@@ -1,4 +1,4 @@
-# BigDataGovernance_2.5_TemplateBase
+# BigDataGovernance TemplateBase version 2.6 
 Proyecto base para ser utilizado en cualquier proyecto BigData
 
 ## Instrucciones
